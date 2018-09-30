@@ -16,9 +16,14 @@ type Photo {
   taggedUsers: [User!]!
   created: DateTime!
 }
+type AuthPayload {
+  token: String!
+}
 type Query {
   totalPhotos: Int!
   allPhotos: [Photo!]!
+  totalUsers: Int!
+  allUsers: [User!]!
 }
 input PostPhotoInput {
   name: String!
@@ -27,6 +32,7 @@ input PostPhotoInput {
 }
 type Mutation {
   postPhoto(input: PostPhotoInput!): Photo!
+  githubAuth(code: String!): AuthPayload!
 }
 type User {
   githubLogin: ID!
