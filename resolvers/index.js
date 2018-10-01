@@ -82,7 +82,8 @@ module.exports = {
       db
         .collection("users")
         .find()
-        .toArray()
+        .toArray(),
+    me: (parent, args, { currentUser }) => currentUser
   },
   Mutation: {
     postPhoto(parent, args) {
