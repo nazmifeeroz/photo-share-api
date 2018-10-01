@@ -62,9 +62,7 @@ const requestGithubUserAccount = token =>
     });
 
 async function authorizeWithGithub(credentials) {
-  console.log(credentials);
   const { access_token } = await requestGithubToken(credentials);
-  console.log(access_token);
   const githubUser = await requestGithubUserAccount(access_token);
   return { ...githubUser, access_token };
 }
@@ -120,14 +118,13 @@ module.exports = {
         avatar: avatar_url
       };
 
-      // const {
-      //   ops: [user]
-      // } = await db
-      //   .collection("users")
-      //   .replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true });
+      const {
+        ops: [user]
+      } = await db
+        .collection("users")
+        .replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true });
 
-      // return { user, token: access_token };
-      return { token: access_token };
+      return { user, token: access_token };
     }
   },
   Photo: {

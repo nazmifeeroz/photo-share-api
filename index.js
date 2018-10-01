@@ -1,12 +1,12 @@
+require("dotenv").config();
 const { ApolloServer } = require("apollo-server-express");
 const express = require("express");
-const expressPlayground = require("graphql-playground-middleware-express")
-  .default;
 const { readFileSync } = require("fs");
 const { MongoClient } = require("mongodb");
-require("dotenv").config();
 const typeDefs = readFileSync("./typeDefs.graphql", "UTF-8");
 const resolvers = require("./resolvers");
+const expressPlayground = require("graphql-playground-middleware-express")
+  .default;
 
 async function start() {
   const app = express();
@@ -22,7 +22,8 @@ async function start() {
 
   const server = new ApolloServer({
     typeDefs,
-    resolvers
+    resolvers,
+    context
   });
 
   server.applyMiddleware({ app });
