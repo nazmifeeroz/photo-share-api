@@ -37,6 +37,7 @@ type Mutation {
   githubAuth(code: String!): AuthPayload!
   addFakeUsers(count: Int = 1): [User!]!
   fakeUserAuth(githubLogin: ID!): AuthPayload!
+  dropUsers: Boolean!
 }
 type User {
   githubLogin: ID!
