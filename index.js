@@ -1,5 +1,6 @@
 require("dotenv").config();
-const { ApolloServer } = require("apollo-server-express");
+const { createServer } = require("http");
+const { ApolloServer, PubSub } = require("apollo-server-express");
 const express = require("express");
 const { readFileSync } = require("fs");
 const { MongoClient } = require("mongodb");
@@ -18,15 +19,16 @@ async function start() {
   );
   const db = client.db();
 
-  // const context = { db };
-
+  const pubsub = new PubSub();
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: async ({ req }) => {
-      const githubToken = req.headers.authorization;
+    context: async ({ req, connection }) => {
+      const githubToken = req
+        ? req.headers.authorization
+        : connection.context.Authorization;
       const currentUser = await db.collection("users").findOne({ githubToken });
-      return { db, currentUser };
+      return { db, currentUser, pubsub };
     }
   });
 
@@ -36,11 +38,18 @@ async function start() {
 
   app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
 
-  app.listen({ port: 4000 }, () =>
-    console.log(
-      `GraphQL Server running @ http://localhost:4000${server.graphqlPath}`
-    )
+  const httpServer = createServer(app);
+  server.installSubscriptionHandlers(httpServer);
+
+  httpServer.listen({ port: 4000 }, () =>
+    console.log(`GraphQL server running at localhost:4000${server.graphqlPath}`)
   );
+
+  //   app.listen({ port: 4000 }, () =>
+  //     console.log(
+  //       `GraphQL Server running @ http://localhost:4000${server.graphqlPath}`
+  //     )
+  //   );
 }
 
 start();

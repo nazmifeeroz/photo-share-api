@@ -46,3 +46,14 @@ type User {
   postedPhotos: [Photo!]!
   inPhotos: [Photo!]!
 }
+type FakeUser {
+  id: ID!
+  githubLogin: ID!
+  name: String
+  avatar: String
+  githubToken: String
+}
+type Subscription {
+  newPhoto: Photo!
+  newUser: FakeUser!
+}

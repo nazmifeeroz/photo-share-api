@@ -29,6 +29,16 @@ async function authorizeWithGithub(credentials) {
 }
 
 module.exports = {
+  Subscription: {
+    newPhoto: {
+      subscribe: (parent, args, { pubsub }) =>
+        pubsub.asyncIterator("photo-added")
+    },
+    newUser: {
+      subscribe: (parent, args, { pubsub }) =>
+        pubsub.asyncIterator("user-added")
+    }
+  },
   Query: {
     totalPhotos: (parent, args, { db }) =>
       db.collection("photos").estimatedDocumentCount(),
@@ -66,7 +76,7 @@ module.exports = {
         user
       };
     },
-    addFakeUsers: async (root, { count }, { db }) => {
+    addFakeUsers: async (root, { count }, { db, pubsub }) => {
       const randomUserApi = `https://randomuser.me/api/?results=${count}`;
       const { results } = await fetch(randomUserApi).then(res => res.json());
       const users = results.map(r => ({
@@ -75,10 +85,17 @@ module.exports = {
         avatar: r.picture.thumbnail,
         githubToken: r.login.sha1
       }));
-      await db.collection("users").insert(users);
+      const { insertedIds } = await db.collection("users").insert(users);
+      // users.forEach((user, i) => {
+      //   user.id = insertedIds[i];
+
+      //   pubsub.publish("user-added", { user });
+      // });
+
+      // pubsub.publish("photo-added", { newPhoto });
       return users;
     },
-    postPhoto: async (parent, args, { db, currentUser }) => {
+    postPhoto: async (parent, args, { db, currentUser, pubsub }) => {
       if (!currentUser) {
         throw new Error("only an authorized user can post a photo");
       }
@@ -89,6 +106,7 @@ module.exports = {
       };
       const { insertedIds } = await db.collection("photos").insert(newPhoto);
       newPhoto.id = insertedIds[0];
+      pubsub.publish("photo-added", { newPhoto });
       return newPhoto;
     },
     async githubAuth(parent, { code }, { db }) {
