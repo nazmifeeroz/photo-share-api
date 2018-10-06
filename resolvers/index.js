@@ -86,13 +86,11 @@ module.exports = {
         githubToken: r.login.sha1
       }));
       const { insertedIds } = await db.collection("users").insert(users);
-      // users.forEach((user, i) => {
-      //   user.id = insertedIds[i];
+      users.forEach((newUser, i) => {
+        newUser.id = insertedIds[i];
+        pubsub.publish("user-added", { newUser });
+      });
 
-      //   pubsub.publish("user-added", { user });
-      // });
-
-      // pubsub.publish("photo-added", { newPhoto });
       return users;
     },
     postPhoto: async (parent, args, { db, currentUser, pubsub }) => {
