@@ -1,4 +1,5 @@
 require("dotenv").config();
+const path = require("path");
 const { createServer } = require("http");
 const { ApolloServer, PubSub } = require("apollo-server-express");
 const express = require("express");
@@ -38,6 +39,10 @@ async function start() {
 
   app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
 
+  app.use(
+    "/img/photos",
+    express.static(path.join(__dirname, "assets", "photos"))
+  );
   const httpServer = createServer(app);
   server.installSubscriptionHandlers(httpServer);
 

@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const path = require("path");
 
 module.exports = {
   dropUsers: async (parent, args, { db }) => {
@@ -48,6 +49,15 @@ module.exports = {
     };
     const { insertedIds } = await db.collection("photos").insert(newPhoto);
     newPhoto.id = insertedIds[0];
+    const toPath = path.join(
+      __dirname,
+      "..",
+      "assets",
+      "photos",
+      `${newPhoto.id}.jpg`
+    );
+    const { stream } = await args.input.file;
+    await uploadFile(input.file, toPath);
     pubsub.publish("photo-added", { newPhoto });
     return newPhoto;
   },

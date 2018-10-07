@@ -6,6 +6,7 @@ enum PhotoCategory {
   GRAPHIC
 }
 scalar DateTime
+scalar Upload
 type Photo {
   id: ID!
   url: String!
@@ -27,7 +28,6 @@ type Query {
   allUsers: [User!]!
   me: User
 }
-# scalar Upload
 input PostPhotoInput {
   name: String!
   category: PhotoCategory = PORTRAIT
