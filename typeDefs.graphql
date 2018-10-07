@@ -27,10 +27,12 @@ type Query {
   allUsers: [User!]!
   me: User
 }
+# scalar Upload
 input PostPhotoInput {
   name: String!
   category: PhotoCategory = PORTRAIT
   description: String
+  # file: Upload!
 }
 type Mutation {
   postPhoto(input: PostPhotoInput!): Photo!
